@@ -13,7 +13,7 @@ function ConnectionStart() {
 
 connection.onclose(async () => { await ConnectionStart(); });
 
-/* TESTE */
+/*  */
 function HabilitarCadastro() {
     var formCadastro = document.getElementById("form-cadastro");
     if (formCadastro != null) {
