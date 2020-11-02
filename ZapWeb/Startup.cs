@@ -33,6 +33,7 @@ namespace ZapWeb
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+            
             services.AddDbContext<BancoContext>(cfg => {
                 cfg.UseSqlite("Data Source=Database\\ZapWeb.db");
             });
@@ -65,8 +66,7 @@ namespace ZapWeb
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            app.UseSignalR(cfg =>
-            {
+            app.UseSignalR(cfg => {
                 cfg.MapHub<ZapWebHub>("/ZapWebHub");
             });
 

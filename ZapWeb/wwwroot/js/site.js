@@ -30,10 +30,12 @@ function HabilitarCadastro() {
         });
     }
 
+
     connection.on("ReceberCadastro", function (sucesso, usuario, msg) {
         var mensagem = document.getElementById("mensagem");
         if (sucesso) {
             console.info(usuario);
+
 
             document.getElementById("nome").value = "";
             document.getElementById("email").value = "";
@@ -43,6 +45,11 @@ function HabilitarCadastro() {
         mensagem.innerText = msg;
     });
 }
+
+
+
+
+
 
 
 ConnectionStart();

@@ -19,7 +19,7 @@ namespace ZapWeb.Hubs
         {
             bool IsExistUser = _banco.Usuarios.Where(a => a.Email == usuario.Email).Count() > 0;
 
-            if (IsExistUser == true)
+            if (IsExistUser)
             {
                 await Clients.Caller.SendAsync("ReceberCadastro", false, null, "E-mail já cadastrado!");
             }
