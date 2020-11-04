@@ -37,7 +37,12 @@ namespace ZapWeb
             services.AddDbContext<BancoContext>(cfg => {
                 cfg.UseSqlite("Data Source=Database\\ZapWeb.db");
             });
-            services.AddSignalR();
+            
+            //Configura a biblioteca do SignalR para o projeto.
+            services.AddSignalR(cfg => {
+                cfg.EnableDetailedErrors = true;
+            });
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
@@ -66,6 +71,7 @@ namespace ZapWeb
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
+            //Inicia a biblioteca do SignalR no projeto.
             app.UseSignalR(cfg => {
                 cfg.MapHub<ZapWebHub>("/ZapWebHub");
             });

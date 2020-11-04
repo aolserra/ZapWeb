@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,68 @@ namespace ZapWeb.Hubs
                 await Clients.Caller.SendAsync("ReceberCadastro", true, usuario, "Usuário cadastrado com sucesso!");
             }
 
+        }
+
+        public async Task Login(Usuario usuario)
+        {
+            var usuarioDB = _banco.Usuarios.FirstOrDefault(a => a.Email == usuario.Email && a.Senha == usuario.Senha);
+
+            if (usuarioDB == null)
+            {
+                await Clients.Caller.SendAsync("ReceberLogin", false, null, "E-mail ou senha errado!");
+            }
+            else
+            {
+                await Clients.Caller.SendAsync("ReceberLogin", true, usuarioDB, null);
+            }
+        }
+
+        public async Task AddConnectionIdDoUsuario(Usuario usuario)
+        {
+            var ConnectionIdCurrent = Context.ConnectionId;
+            List<string> connectionsId = null;
+
+            Usuario usuarioDB = _banco.Usuarios.Find(usuario.Id);
+            if (usuarioDB.ConnectionId == null)
+            {
+                connectionsId = new List<string>();
+                connectionsId.Add(ConnectionIdCurrent);
+            }
+            else
+            {
+                connectionsId = JsonConvert.DeserializeObject<List<string>>(usuarioDB.ConnectionId);
+                if (!connectionsId.Contains(ConnectionIdCurrent))
+                {
+                    connectionsId.Add(ConnectionIdCurrent);
+                }
+            }
+
+            usuarioDB.ConnectionId = JsonConvert.SerializeObject(connectionsId);
+            _banco.Usuarios.Update(usuarioDB);
+            _banco.SaveChanges();
+
+            //TODO Adicionado ConnectionId ao Gsrupos de conversas desse usuário.
+        }
+
+        public async Task DelConnectionIdDoUsuario(Usuario usuario)
+        {
+            Usuario usuarioDB = _banco.Usuarios.Find(usuario.Id);
+            if (usuarioDB.ConnectionId.Length > 0)
+            {
+                var ConnectionIdCurrent = Context.ConnectionId;
+
+                List<string> connectionsId = JsonConvert.DeserializeObject<List<string>>(usuarioDB.ConnectionId);
+                if (connectionsId.Contains(ConnectionIdCurrent))
+                {
+                    connectionsId.Remove(ConnectionIdCurrent);
+                }
+                usuarioDB.ConnectionId = JsonConvert.SerializeObject(connectionsId);
+
+                _banco.Usuarios.Update(usuarioDB);
+                _banco.SaveChanges();
+            }
+
+            //TODO Remover ConnctionId dos Grupos de conversas desse usuário.
         }
     }
 }
