@@ -8,7 +8,7 @@ function ConnectionStart() {
         console.info("Connected!");
     }).catch(function (err) {
         console.error(err.toString());
-        setTimeout(ConnectionStart, 5000);
+        setTimeout(ConnectionStart(), 5000);
     });
 }
 
@@ -31,10 +31,12 @@ function HabilitarCadastro() {
         });
     }
 
+
     connection.on("ReceberCadastro", function (sucesso, usuario, msg) {
         var mensagem = document.getElementById("mensagem");
         if (sucesso) {
             console.info(usuario);
+
 
             document.getElementById("nome").value = "";
             document.getElementById("email").value = "";
@@ -49,7 +51,7 @@ function HabilitarLogin() {
     var formLogin = document.getElementById("form-login");
     if (formLogin != null) {
         if (GetUsuarioLogado() != null) {
-            window.Location.href = "/Home/Conversacao";
+            window.location.href = "/Home/Conversacao";
         }
 
         var btnAcessar = document.getElementById("btnAcessar");
@@ -77,14 +79,14 @@ function HabilitarLogin() {
 var telaconversacao = document.getElementById("tela-conversacao");
 if (telaconversacao != null) {
     if (GetUsuarioLogado() == null) {
-        window.Location.href = "/Home/Login";
+        window.location.href = "/Home/Login";
     }
 
     var btnSair = document.getElementById("btnSair");
-    btnSair.addEventListener("click", function ()) {
+    btnSair.addEventListener("click", function () {
         DelUsuarioLogado();
-        window.Location.href = "/Home/Login";
-    }
+        window.location.href = "/Home/Login";
+    });
 }
 
 function GetUsuarioLogado() {
@@ -98,4 +100,5 @@ function SetUsuarioLogado(usuario) {
 function DelUsuarioLogado() {
     sessionStorage.removeItem("Logado");
 }
+
 ConnectionStart();
