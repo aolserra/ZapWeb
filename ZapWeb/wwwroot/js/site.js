@@ -3,11 +3,12 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/ZapWebHub").build(
 
 function ConnectionStart() {
     connection.start().then(function () {
+        HabilitarLogin();
         HabilitarCadastro();
         console.info("Connected!");
     }).catch(function (err) {
         console.error(err.toString());
-        setTimeout(ConnectionStart(), 5000);
+        setTimeout(ConnectionStart, 5000);
     });
 }
 
@@ -44,5 +45,57 @@ function HabilitarCadastro() {
     });
 }
 
+function HabilitarLogin() {
+    var formLogin = document.getElementById("form-login");
+    if (formLogin != null) {
+        if (GetUsuarioLogado() != null) {
+            window.Location.href = "/Home/Conversacao";
+        }
 
+        var btnAcessar = document.getElementById("btnAcessar");
+        btnAcessar.addEventListener("click", function () {
+            var email = document.getElementById("email").value;
+            var senha = document.getElementById("senha").value;
+
+            var usuario = { Email: email, Senha: senha };
+
+            connection.invoke("Login", usuario);
+        });
+    }
+
+    connection.on("ReceberLogin", function (sucesso, usuario, msg) {
+        if (sucesso) {
+            SetUsuarioLogado(usuario);
+            window.location.href = "/Home/Conversacao";
+        } else {
+            var mensgaem = document.getElementById("mensagem");
+            mensagem.innerText = msg;
+        }
+    });
+}
+
+var telaconversacao = document.getElementById("tela-conversacao");
+if (telaconversacao != null) {
+    if (GetUsuarioLogado() == null) {
+        window.Location.href = "/Home/Login";
+    }
+
+    var btnSair = document.getElementById("btnSair");
+    btnSair.addEventListener("click", function ()) {
+        DelUsuarioLogado();
+        window.Location.href = "/Home/Login";
+    }
+}
+
+function GetUsuarioLogado() {
+    return JSON.parse(sessionStorage.getItem("Logado"));
+}
+
+function SetUsuarioLogado(usuario) {
+    sessionStorage.setItem("Logado", JSON.stringify(usuario));
+}
+
+function DelUsuarioLogado() {
+    sessionStorage.removeItem("Logado");
+}
 ConnectionStart();
