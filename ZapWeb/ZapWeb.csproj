@@ -16,4 +16,11 @@
     </PackageReference>
   </ItemGroup>
 
+
+  <ItemGroup>
+    <None Update="Database\ZapWeb.db">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

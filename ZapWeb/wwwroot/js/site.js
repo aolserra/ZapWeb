@@ -94,7 +94,15 @@ function HabilitarConversacao() {
         MonitorarListaUsuarios();
         EnviarReceberMensagem();
         AbrirGrupo();
+        OfflineDetect();
     }
+}
+
+function OfflineDetect() {
+    window.addEventListener("beforeunload", function (event) {
+        connection.invoke("DelConnectionIdDoUsuario", GetUsuarioLogado());
+        event.returnValue = "Tem certeza que deseja sair?";
+    });
 }
 
 function AbrirGrupo() {

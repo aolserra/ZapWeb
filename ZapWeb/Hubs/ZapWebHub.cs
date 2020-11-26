@@ -49,7 +49,7 @@ namespace ZapWeb.Hubs
                 _banco.Usuarios.Update(usuarioDB);
                 _banco.SaveChanges();
 
-                await Clients.All.SendAsync("ReceberListaUsuarios", _banco.Usuarios.ToList());
+                await NotificarMudancaNasListaUsurios();
             }
         }
 
@@ -62,7 +62,7 @@ namespace ZapWeb.Hubs
 
             await DelConnectionIdDoUsuario(usuarioDB);
 
-            await Clients.All.SendAsync("ReceberListaUsuarios", _banco.Usuarios.ToList());
+            await NotificarMudancaNasListaUsurios();
 
         }
 
@@ -87,10 +87,12 @@ namespace ZapWeb.Hubs
                 }
             }
 
+            usuarioDB.IsOnline = true;
             usuarioDB.ConnectionId = JsonConvert.SerializeObject(connectionsId);
 
             _banco.Usuarios.Update(usuarioDB);
             _banco.SaveChanges();
+            await NotificarMudancaNasListaUsurios();
 
             //Adicionar ConnectionsId aos grupos do SignalR
             var grupos = _banco.Grupos.Where(a => a.Usuarios.Contains(usuarioDB.Email));
@@ -112,15 +114,20 @@ namespace ZapWeb.Hubs
                 var connectionIdCurrent = Context.ConnectionId;
 
                 connectionsId = JsonConvert.DeserializeObject<List<string>>(usuarioDB.ConnectionId);
-
                 if (connectionsId.Contains(connectionIdCurrent))
                 {
                     connectionsId.Remove(connectionIdCurrent);
                 }
                 usuarioDB.ConnectionId = JsonConvert.SerializeObject(connectionsId);
 
+                if (connectionsId.Count <= 0)
+                {
+                    usuarioDB.IsOnline = false;
+                }
+
                 _banco.Usuarios.Update(usuarioDB);
                 _banco.SaveChanges();
+                await NotificarMudancaNasListaUsurios();
 
                 //Remoção da ConnectionId dos Grupos de conversa desse usuário no SignalR.
                 var grupos = _banco.Grupos.Where(a => a.Usuarios.Contains(usuarioDB.Email));
@@ -138,6 +145,12 @@ namespace ZapWeb.Hubs
         {
             var usuarios = _banco.Usuarios.ToList();
             await Clients.Caller.SendAsync("ReceberListaUsuarios", usuarios);
+        }
+        
+        public async Task NotificarMudancaNasListaUsurios()
+        {
+            var usuarios = _banco.Usuarios.ToList();
+            await Clients.All.SendAsync("ReceberListaUsuarios", usuarios);
         }
 
         public async Task CriarOuAbrirGrupo(string emailUserUm, string emailUserDois)
