@@ -160,4 +160,22 @@
   <ItemGroup>
     <BundleResource Include="Resources\chaticon%403x.png" />
   </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\chatmsgsmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\chatmsgsmall%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\chatmsgsmall%403x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\send.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\send%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\send%403x.png" />
+  </ItemGroup>
 </Project>
