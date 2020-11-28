@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using ZapApp.Models;
+using ZapApp.Services;
 
 namespace ZapApp
 {
@@ -16,6 +17,16 @@ namespace ZapApp
         public ListagemUsuarios()
         {
             InitializeComponent();
+
+            Sair.Clicked += async (sender, args) =>
+            {
+                //SignalR
+                await ZapWebService.GetInstance().Sair(UsuarioManager.GetUsuarioLogado());
+                //App
+                UsuarioManager.DelUsuarioLogado();
+
+                App.Current.MainPage = new Inicio();
+            };
         }
     }
 

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using ZapApp.Services;
 
 namespace ZapApp
 {
@@ -10,8 +12,7 @@ namespace ZapApp
         {
             InitializeComponent();
 
-            //MainPage = new Inicio();
-            MainPage = new NavigationPage(new ListagemMensagens());
+            MainPage = new Inicio();
         }
 
         protected override void OnStart()
@@ -20,10 +21,13 @@ namespace ZapApp
 
         protected override void OnSleep()
         {
+            //SignalR
+            Task.Run(async () => { await ZapWebService.GetInstance().Sair(UsuarioManager.GetUsuarioLogado()); });
         }
 
         protected override void OnResume()
         {
+            Task.Run(async () => { await ZapWebService.GetInstance().Entrar(UsuarioManager.GetUsuarioLogado()); });
         }
     }
 }

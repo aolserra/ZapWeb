@@ -11,7 +11,10 @@
     <ContentPage.Content>
         <ListView ItemsSource="{Binding Usuarios}" RowHeight="70">
             <ListView.Header>
-                <Image Source="ZapWebLogo.png" Margin="0, 30" />
+                <StackLayout>
+                    <Image Source="ZapWebLogo.png" Margin="0, 30" />
+                    <Button x:Name="Sair" Text="Sair" />
+                </StackLayout>
             </ListView.Header>
             <ListView.ItemTemplate>
                 <DataTemplate>
