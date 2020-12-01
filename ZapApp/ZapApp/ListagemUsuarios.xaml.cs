@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,32 +24,50 @@ namespace ZapApp
             {
                 //SignalR
                 await ZapWebService.GetInstance().Sair(UsuarioManager.GetUsuarioLogado());
+
                 //App
                 UsuarioManager.DelUsuarioLogado();
 
                 App.Current.MainPage = new Inicio();
             };
+
+            Listagem.ItemTapped += (sender, args) =>
+            {
+                Usuario usuario = (Usuario)args.Item;
+
+                var listagemMensagens = new ListagemMensagens();
+                listagemMensagens.SetUsuario(usuario);
+
+                Navigation.PushAsync(listagemMensagens);
+            };
+
+           Task.Run(async()=> { await ZapWebService.GetInstance().ObterListaUsuarios(); });
         }
     }
 
-    public class ListagemUsuariosViewModel
+    public class ListagemUsuariosViewModel : INotifyPropertyChanged
     {
-        public List<Usuario> Usuarios { get; set; }
+        private List<Usuario> _usuarios;
+        public List<Usuario> Usuarios { 
+            get {
+                return _usuarios;
+            }
+            set {
+                _usuarios = value;
+                NotifyPropertyChanged(nameof(Usuarios));
+            }
+        }
 
         public ListagemUsuariosViewModel()
         {
-            Usuarios = MockUsuarios();
+           
         }
 
-        private List<Usuario> MockUsuarios()
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
-            return new List<Usuario>()
-            {
-                new Usuario { Nome = "Anderson Serra", Email = "aolserra@gmail.com", Senha = "123456", IsOnline = false },
-                new Usuario { Nome = "Viviane Barboza", Email = "vivianebarboza@live.com", Senha = "123456", IsOnline = false },
-                new Usuario { Nome = "Jonas Serra", Email = "jonas123@gmail.com", Senha = "123456", IsOnline = false },
-                new Usuario { Nome = "Fernando Serra", Email = "fernando123@gmail.com", Senha = "123456", IsOnline = false },
-            };
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

@@ -8,14 +8,16 @@
              xmlns:viewModel="clr-namespace:ZapApp"
              xmlns:dataTemplate="clr-namespace:ZapApp"
              xmlns:component="clr-namespace:ZapApp.Components"
-             x:Class="ZapApp.ListagemMensagens"
-             Title="Viviane">
+             xmlns:converter="clr-namespace:ZapApp.Converters"
+             x:Class="ZapApp.ListagemMensagens">
     <ContentPage.BindingContext>
         <viewModel:ListagemMensagensViewModel/>
     </ContentPage.BindingContext>
 
     <ContentPage.Resources>
         <ResourceDictionary>
+            <converter:NomeConverter x:Key="nomeConverter" />
+            
             <DataTemplate x:Key="esquerdaPersonTemplate">
                 <ViewCell>
                     <Grid BackgroundColor="#F0F0F0" Padding="7">
@@ -32,7 +34,7 @@
                             <StackLayout>
                                 <StackLayout Orientation="Horizontal">
                                     <Image WidthRequest="25" Source="chatmsgsmall.png" />
-                                    <Label Text="{Binding Usuario.Nome}" TextColor="Black"></Label>
+                                    <Label Text="{Binding Usuario.Nome, Converter={StaticResource nomeConverter}}" TextColor="Black"></Label>
                                 </StackLayout>
                                 <Label Text="{Binding Texto}" TextColor="#8C8C8C"></Label>
                             </StackLayout>
@@ -55,7 +57,7 @@
                         <Frame Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" HasShadow="True" CornerRadius="20">
                             <StackLayout>
                                 <StackLayout Orientation="Horizontal" HorizontalOptions="End">
-                                    <Label Text="{Binding Usuario.Nome}" TextColor="Black"></Label>
+                                    <Label Text="{Binding Usuario.Nome, Converter={StaticResource nomeConverter}}" TextColor="Black"></Label>
                                     <Image WidthRequest="25" Source="chatmsgsmall.png" />
                                 </StackLayout>
                                 <Label Text="{Binding Texto}" TextColor="#8C8C8C" HorizontalTextAlignment="End"></Label>
@@ -72,7 +74,7 @@
     
     <ContentPage.Content>
         <StackLayout>
-            <ListView SeparatorVisibility="None" ItemsSource="{Binding Mensagems}" HasUnevenRows="True" ItemTemplate="{StaticResource mensagemDataTemplateSelector}" />
+            <ListView x:Name="Listagem" SeparatorVisibility="None" ItemsSource="{Binding Mensagems}" HasUnevenRows="True" ItemTemplate="{StaticResource mensagemDataTemplateSelector}" />
             
             <Grid VerticalOptions="End" Padding="10">
                 <Grid.RowDefinitions>
@@ -85,9 +87,9 @@
 
                 <Frame Grid.Row="0" Grid.Column="0" BackgroundColor="#32A060" Padding="15, 5" CornerRadius="30">
 
-                    <component:CleanEntry Placeholder="Mensagem" PlaceholderColor="White" TextColor="White" WidthRequest="280" HorizontalOptions="StartAndExpand" />
+                    <component:CleanEntry x:Name="Mensagem" Placeholder="Mensagem" PlaceholderColor="White" TextColor="White" WidthRequest="280" HorizontalOptions="StartAndExpand" />
                 </Frame>
-                <Button Grid.Row="0" Grid.Column="1" ImageSource="send.png" TextColor="White" BackgroundColor="#32A060" HorizontalOptions="Center" CornerRadius="30" WidthRequest="60"/>
+                <Button x:Name="Enviar" Grid.Row="0" Grid.Column="1" ImageSource="send.png" TextColor="White" BackgroundColor="#32A060" HorizontalOptions="Center" CornerRadius="30" WidthRequest="60"/>
             </Grid>
         </StackLayout>
     </ContentPage.Content>

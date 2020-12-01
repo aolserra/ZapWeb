@@ -1,5 +1,9 @@
 ﻿/* Conexão e Reconexão com o SignalR - Hub */
-var connection = new signalR.HubConnectionBuilder().withUrl("/ZapWebHub").build();
+var connection = new signalR
+    .HubConnectionBuilder()
+    .withUrl("/ZapWebHub")
+    .withHubProtocol(new signalR.protocols.msgpack.MessagePackHubProtocol())
+    .build();
 var nomeGrupo = "";
 
 function ConnectionStart() {
@@ -39,9 +43,6 @@ function HabilitarCadastro() {
     connection.on("ReceberCadastro", function (sucesso, usuario, msg) {
         var mensagem = document.getElementById("mensagem");
         if (sucesso) {
-            console.info(usuario);
-
-
             document.getElementById("nome").value = "";
             document.getElementById("email").value = "";
             document.getElementById("senha").value = "";
@@ -94,15 +95,7 @@ function HabilitarConversacao() {
         MonitorarListaUsuarios();
         EnviarReceberMensagem();
         AbrirGrupo();
-        OfflineDetect();
     }
-}
-
-function OfflineDetect() {
-    window.addEventListener("beforeunload", function (event) {
-        connection.invoke("DelConnectionIdDoUsuario", GetUsuarioLogado());
-        event.returnValue = "Tem certeza que deseja sair?";
-    });
 }
 
 function AbrirGrupo() {
@@ -116,12 +109,13 @@ function AbrirGrupo() {
 
         var mensagemHTML = "";
         for (i = 0; i < mensagens.length; i++) {
-            console.info(mensagens[i].usuario.id);
-            mensagemHTML += '<div class="message message-' + (mensagens[i].usuario.id == GetUsuarioLogado().id ? "right" : "left") + '"><div class="message-head"><img src="/imagem/chat.png" /> ' + mensagens[i].usuario.nome + '</div><div class="message-message">' + mensagens[i].texto + '</div></div>'
+            console.info(mensagens[i].Usuario.Id);
+            mensagemHTML += '<div class="message message-' + (mensagens[i].Usuario.Id == GetUsuarioLogado().Id ? "right" : "left") + '"><div class="message-head"><img src="/imagem/chat.png" /> ' + mensagens[i].Usuario.Nome + '</div><div class="message-message">' + mensagens[i].Texto + '</div></div>'
         }
         container.innerHTML += mensagemHTML;
 
         document.querySelector(".container-button").style.display = "flex";
+        MensagemScrollBotton();
     });
 }
 
@@ -131,7 +125,9 @@ function EnviarReceberMensagem() {
         var mensagem = document.getElementById("mensagem").value;
         var usuario = GetUsuarioLogado();
 
-        connection.invoke("EnviarMensagem", usuario, mensagem, nomeGrupo);
+        connection.invoke("EnviarMensagem", usuario, mensagem, nomeGrupo).then(function () {
+            document.getElementById("mensagem").value = "";
+        });
     });
 
 
@@ -139,9 +135,10 @@ function EnviarReceberMensagem() {
 
         if (nomeGrupo == nomeDoGrupo) {
             var container = document.querySelector(".container-messages");
-            var mensagemHTML = '<div class="message message-' + (mensagem.usuario.id == GetUsuarioLogado().id ? "right" : "left") + '"><div class="message-head"><img src="/imagem/chat.png" />' + mensagem.usuario.nome + '</div><div class="message-message">' + mensagem.texto + '</div></div>'
+            var mensagemHTML = '<div class="message message-' + (mensagem.Usuario.Id == GetUsuarioLogado().Id ? "right" : "left") + '"><div class="message-head"><img src="/imagem/chat.png" />' + mensagem.Usuario.Nome + '</div><div class="message-message">' + mensagem.Texto + '</div></div>'
 
             container.innerHTML += mensagemHTML;
+            MensagemScrollBotton();
         }
     });
 }
@@ -152,8 +149,8 @@ function MonitorarListaUsuarios() {
     connection.on("ReceberListaUsuarios", function (usuarios) {
         var html = "";
         for (i = 0; i < usuarios.length; i++) {
-            if (usuarios[i].id != GetUsuarioLogado().id) {
-                html += '<div class="container-user-item"><img src = "/imagem/logo.png" style = "width: 20%;" /><div><span>' + usuarios[i].nome.split(" ")[0] + ' (' + (usuarios[i].isOnline ? "online" : "offline") + ')</span><br /><span class="email">' + usuarios[i].email + '</span></div></div>';
+            if (usuarios[i].Id != GetUsuarioLogado().Id) {
+                html += '<div class="container-user-item"><img src = "/imagem/logo.png" style = "width: 20%;" /><div><span>' + usuarios[i].Nome.split(" ")[0] + ' (' + (usuarios[i].IsOnline ? "online" : "offline") + ')</span><br /><span class="email">' + usuarios[i].Email + '</span></div></div>';
             }
         }
         document.getElementById("users").innerHTML = html;
@@ -163,7 +160,7 @@ function MonitorarListaUsuarios() {
             container[i].addEventListener("click", function (event) {
                 var componente = event.target || event.srcElement;
 
-                var emailUserUm = GetUsuarioLogado().email;
+                var emailUserUm = GetUsuarioLogado().Email;
                 var emailUserDois = componente.parentElement.querySelector(".email").innerText;
 
                 connection.invoke("CriarOuAbrirGrupo", emailUserUm, emailUserDois);
@@ -198,6 +195,11 @@ function SetUsuarioLogado(usuario) {
 
 function DelUsuarioLogado() {
     sessionStorage.removeItem("Logado");
+}
+
+function MensagemScrollBotton() {
+    var container = document.querySelector(".container-messages");
+    container.scrollTo(0, container.scrollHeight);
 }
 
 ConnectionStart();

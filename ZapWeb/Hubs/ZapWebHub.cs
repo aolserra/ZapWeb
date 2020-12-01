@@ -17,6 +17,17 @@ namespace ZapWeb.Hubs
         {
             _banco = banco;
         }
+
+        public override async Task OnDisconnectedAsync(Exception exception)
+        {
+            var usuario = _banco.Usuarios.FirstOrDefault(a=>a.ConnectionId.Contains(Context.ConnectionId));
+            if (usuario != null)
+            {
+                await DelConnectionIdDoUsuario(usuario);
+            }
+            
+            await base.OnDisconnectedAsync(exception);
+        }
         public async Task Cadastrar(Usuario usuario)
         {
             bool IsExistUser = _banco.Usuarios.Where(a => a.Email == usuario.Email).Count() > 0;

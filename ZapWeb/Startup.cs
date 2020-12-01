@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Serialization;
 using ZapWeb.Database;
 using ZapWeb.Hubs;
 
@@ -41,7 +42,11 @@ namespace ZapWeb
             //Configura a biblioteca do SignalR para o projeto.
             services.AddSignalR(cfg => {
                 cfg.EnableDetailedErrors = true;
-            });
+            })
+                .AddMessagePackProtocol()
+                .AddJsonProtocol(cfg => {
+                    cfg.PayloadSerializerSettings.ContractResolver = new DefaultContractResolver();
+                });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
